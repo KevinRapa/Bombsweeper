@@ -9,7 +9,7 @@ class GameController(object):
     #
     
     OUTPUTS = ("BOOOOOOOOOOOOOOOMMMMMMM!!!!.", "Oh phew...", "You win!", "That cell is flagged")
-    MAX_CELLS = 12200
+    MAX_CELLS = 9801
     
     @staticmethod
     def createGame():
@@ -55,7 +55,7 @@ class GameController(object):
                 elif numB >= numC * numR:
                     print("You must specify at least 1 empty cell!")
                 elif numC * numR > GameController.MAX_CELLS:
-                    print("That's too big. Max number of cells is 1,220.")
+                    print("That's too big. Max number of cells is 9801 or a 99 x 99 grid.")
                 else:
                     return MinesweeperGame(xDim = numC, yDim = numR, numBombs = numB)
             else:
@@ -256,14 +256,14 @@ class Board(object):
         while len(adjList) > 0:
             # Flip adjacent cells till the queue is empty
             x, y = adjList.pop(0)
-            print(x, " ", y) 
+
             if notBombOrFlipped(self, y, x):
                 self.cells[y][x].flip()
                 self.freeCells -= 1
             else:
                 continue
 
-            if not self.cells[y][x].isEmpty():
+            if self.cells[y][x].isEmpty():
                 for pair in Board.ADJS_NO_DIAGONAL:
                     i, j = pair[0], pair[1]
                 
