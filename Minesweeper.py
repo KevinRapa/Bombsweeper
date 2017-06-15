@@ -8,8 +8,8 @@ class GameController(object):
     # Creates and resets games as needed
     #
     
-    OUTPUTS = ("You lose.", "Ok.", "You win!", "That cell is flagged")
-    MAX_CELLS = 1220
+    OUTPUTS = ("BOOOOOOOOOOOOOOOMMMMMMM!!!!.", "Oh phew...", "You win!", "That cell is flagged")
+    MAX_CELLS = 12200
     
     @staticmethod
     def createGame():
@@ -111,7 +111,7 @@ class Board(object):
 
     # Index pairs for adjacent cells.
     ADJS = ((-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (1, -1), (-1, 1))
-    ADJS_NO_DIAGONAL = ((-1, 0), (1, 0), (0, -1), (0, 1))
+    ADJS_NO_DIAGONAL = ((-1, 0), (0, -1), (1, 0), (0, 1))
     
     def __init__(self, xDim, yDim, bombs):
         self.cells = []
@@ -217,11 +217,12 @@ class Board(object):
     def flip(self, j, i):
         """
         Flips a cell. When it is flipped, if it's not a bomb, adjacent cells are flipped
-        recursively. Once a cell with a number is flipped or the cell is a bomb, it stops.
+        'recursively'. Once a cell with a number is flipped or the cell is a bomb, it stops.
+        Actually not recursively, in a depth-first style loop using a queue. Think breadth-
+        first search of a binary search tree. Recursion was causing stack overflow.
         """
-        
         cell = self.cells[j][i]
-        
+
         cell.flip()
 
         if cell.isBomb():
@@ -237,19 +238,38 @@ class Board(object):
             if j < 0 or i < 0:
                 return False
             try:
-                if not self.cells[j][i].isBomb() and not self.cells[j][i].isFlipped():
+                if not self.cells[j][i].isFlipped() and not self.cells[j][i].isBomb():
                     return True
                 else:
                     return False
             except:
                 return False
 
+        adjList = []
+        
         for pair in Board.ADJS_NO_DIAGONAL:
             x, y = pair[0], pair[1]
             
             if notBombOrFlipped(self, j + y, i + x):
-                self.flip(j + y, i + x)
+                adjList.append((i + x, j + y))
+        
+        while len(adjList) > 0:
+            # Flip adjacent cells till the queue is empty
+            x, y = adjList.pop(0)
+            print(x, " ", y) 
+            if notBombOrFlipped(self, y, x):
+                self.cells[y][x].flip()
+                self.freeCells -= 1
+            else:
+                continue
 
+            if not self.cells[y][x].isEmpty():
+                for pair in Board.ADJS_NO_DIAGONAL:
+                    i, j = pair[0], pair[1]
+                
+                    if notBombOrFlipped(self, j + y, i + x):
+                        adjList.append((i + x, j + y))
+            
         return False
 
     #-------------------------------------------------------------------------------------
