@@ -111,6 +111,7 @@ class Board(object):
 
     # Index pairs for adjacent cells.
     ADJS = ((-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (1, -1), (-1, 1))
+    ADJS_NO_DIAGONAL = ((-1, 0), (1, 0), (0, -1), (0, 1))
     
     def __init__(self, xDim, yDim, bombs):
         self.cells = []
@@ -171,7 +172,7 @@ class Board(object):
     def __str__(self):
         """Prints the board."""
         
-        result = ""
+        result = "   "
         i = 1
 
         for i in range(1, self.xDim + 1):
@@ -181,6 +182,8 @@ class Board(object):
         i = 1
         
         for row in self.cells:
+            result += str(i) + ("  " if i <= 9 else " ")
+            
             for cll in row:
                 result += str(cll) + " "
                     
@@ -241,7 +244,7 @@ class Board(object):
             except:
                 return False
 
-        for pair in Board.ADJS:
+        for pair in Board.ADJS_NO_DIAGONAL:
             x, y = pair[0], pair[1]
             
             if notBombOrFlipped(self, j + y, i + x):
